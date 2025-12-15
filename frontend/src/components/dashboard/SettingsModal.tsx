@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { createPortal } from "react-dom"
 import { useState, useRef, useEffect } from "react"
 import type { FormEvent } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -41,6 +41,18 @@ export function SettingsModal({ open, onClose, user }: Props) {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [open])
+
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -60,7 +72,6 @@ export function SettingsModal({ open, onClose, user }: Props) {
       alert("Perfil actualizado correctamente")
       onClose()
       
-      // Emitir evento personalizado para que otros componentes se actualicen
       window.dispatchEvent(new Event('profile-updated'))
     } catch (err: any) {
       console.error('Error al actualizar:', err)
@@ -68,24 +79,14 @@ export function SettingsModal({ open, onClose, user }: Props) {
     }
   }
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 flex items-center justify-center p-4"
-          style={{ 
-            content: '',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100dvw',
-            height: '100dvh'
-          }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
           onClick={onClose}
         >
           <motion.div
@@ -248,4 +249,6 @@ export function SettingsModal({ open, onClose, user }: Props) {
       )}
     </AnimatePresence>
   )
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null
 }

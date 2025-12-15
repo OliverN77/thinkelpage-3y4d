@@ -8,22 +8,38 @@ export function useAuth() {
 
   const fetchUser = useCallback(async () => {
     const token = localStorage.getItem('token');
+    console.log('🔍 [useAuth] Token en localStorage:', token ? `${token.substring(0, 20)}...` : 'null');
+    
     if (!token) {
+      console.log('❌ [useAuth] No hay token, saltando petición');
       setLoading(false);
       return;
     }
     
     try {
+      console.log('📡 [useAuth] Solicitando perfil...');
       const res = await getProfile();
+      console.log('✅ [useAuth] Respuesta del perfil:', res);
+      
       if (res.success && res.user) {
-        setUser(res.user);
+        // Convertir null a undefined para avatar
+        const userData = {
+          ...res.user,
+          avatar: res.user.avatar || undefined
+        };
+        console.log('✅ [useAuth] Usuario cargado:', userData);
+        setUser(userData);
       } else {
+        console.log('❌ [useAuth] Respuesta sin éxito:', res);
         setUser(null);
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
       }
-    } catch (err) {
-      console.error('Error al cargar perfil:', err);
+    } catch (err: any) {
+      console.error('❌ [useAuth] Error al cargar perfil:', err.message);
+      console.error('❌ [useAuth] Status:', err.response?.status);
+      console.error('❌ [useAuth] Respuesta:', err.response?.data);
+      console.error('❌ [useAuth] Headers enviados:', err.config?.headers);
       setUser(null);
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
@@ -33,10 +49,12 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
+    console.log('🔄 [useAuth] Iniciando carga de usuario...');
     fetchUser();
 
     // Escuchar evento de actualización de perfil
     const handleProfileUpdate = () => {
+      console.log('🔄 [useAuth] Evento profile-updated detectado');
       fetchUser();
     };
 

@@ -78,7 +78,7 @@ export function SettingsModal({ open, onClose, user }: Props) {
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-20 flex items-center justify-center p-4"
           style={{ 
             content: '',
-            position: 'relative',
+            position: 'absolute',
             top: 0,
             left: 0,
             right: 0,

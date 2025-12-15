@@ -34,28 +34,30 @@ export default function MinimalForm() {
     try {
       if (isLogin) {
         const res = await loginUser({ email, password })
-        console.log('Login exitoso ✅', res.data)
-        localStorage.setItem('token', res.data.token)
-        localStorage.setItem('userId', res.data.user.id)
-        alert('Inicio de sesión exitoso')
-        navigate('/Blog')
+        console.log('✅ Login exitoso:', res)
+        
+        if (res.success && res.token) {
+          localStorage.setItem('token', res.token)
+          localStorage.setItem('userId', res.user._id)
+          alert('Inicio de sesión exitoso')
+          navigate('/blog') // ✅ Minúscula
+        }
       } else {
         const res = await registerUser({ name, email, password })
-        console.log('Registrado ✅', res.data)
-        localStorage.setItem('token', res.data.token)
-        localStorage.setItem('userId', res.data.user.id)
-        alert('Usuario creado exitosamente')
-        // Redirigir al login después de registrarse
-        setIsLogin(true)
-        setEmail("")
-        setPassword("")
-        setName("")
+        console.log('✅ Registro exitoso:', res)
+        
+        if (res.success && res.token) {
+          localStorage.setItem('token', res.token)
+          localStorage.setItem('userId', res.user._id)
+          alert('Usuario creado exitosamente')
+          navigate('/blog')
+        }
       }
     } catch (err: any) {
       const errorMsg = err.response?.data?.message ||
         (isLogin ? 'Error al iniciar sesión' : 'Error al registrar')
       alert(errorMsg)
-      console.error('Error:', err)
+      console.error('❌ Error:', err)
     } finally {
       setLoading(false)
     }

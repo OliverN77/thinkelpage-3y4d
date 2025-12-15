@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://thinkel.onrender.com';
+// ✅ Cambiar a usar /api
+const API_URL = import.meta.env.VITE_API_URL || 'https://thinkel.onrender.com/api';
 
 // Configurar interceptor para incluir token automáticamente
 const getAuthHeader = () => {
@@ -12,38 +13,26 @@ const getAuthHeader = () => {
 // POSTS
 // ============================================
 
-/**
- * Obtener todos los posts del blog
- */
 export const getAllPosts = async (params?: {
   page?: number;
   limit?: number;
   tag?: string;
   search?: string;
 }) => {
-  const response = await axios.get(`${API_URL}/blog/posts`, { params });
+  const response = await axios.get(`${API_URL}/posts`, { params }); // ✅ Cambiar /blog/posts a /posts
   return response.data;
 };
 
-/**
- * Obtener un post individual por slug
- */
 export const getPostBySlug = async (slug: string) => {
-  const response = await axios.get(`${API_URL}/blog/posts/${slug}`);
+  const response = await axios.get(`${API_URL}/posts/slug/${slug}`); // ✅ Cambiar ruta
   return response.data;
 };
 
-/**
- * Obtener posts de un usuario específico
- */
 export const getPostsByUser = async (username: string) => {
-  const response = await axios.get(`${API_URL}/blog/users/${username}/posts`);
+  const response = await axios.get(`${API_URL}/posts?author=${username}`); // ✅ Usar query params
   return response.data;
 };
 
-/**
- * Crear un nuevo post
- */
 export const createPost = async (data: {
   title: string;
   content: string;
@@ -52,16 +41,13 @@ export const createPost = async (data: {
   thumbnail?: string;
 }) => {
   const response = await axios.post(
-    `${API_URL}/blog/posts`,
+    `${API_URL}/posts`, // ✅ Cambiar ruta
     data,
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Actualizar un post existente
- */
 export const updatePost = async (
   postId: string,
   data: {
@@ -73,30 +59,24 @@ export const updatePost = async (
   }
 ) => {
   const response = await axios.put(
-    `${API_URL}/blog/posts/${postId}`,
+    `${API_URL}/posts/${postId}`, // ✅ Cambiar ruta
     data,
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Eliminar un post
- */
 export const deletePost = async (postId: string) => {
   const response = await axios.delete(
-    `${API_URL}/blog/posts/${postId}`,
+    `${API_URL}/posts/${postId}`, // ✅ Cambiar ruta
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Dar like a un post
- */
 export const likePost = async (postId: string) => {
   const response = await axios.post(
-    `${API_URL}/blog/posts/${postId}/like`,
+    `${API_URL}/posts/${postId}/like`, // ✅ Cambiar ruta
     {},
     { headers: getAuthHeader() }
   );
@@ -107,17 +87,11 @@ export const likePost = async (postId: string) => {
 // COMENTARIOS
 // ============================================
 
-/**
- * Obtener comentarios de un post
- */
 export const getComments = async (postId: string) => {
-  const response = await axios.get(`${API_URL}/blog/posts/${postId}/comments`);
+  const response = await axios.get(`${API_URL}/comments/post/${postId}`); // ✅ Cambiar ruta
   return response.data;
 };
 
-/**
- * Crear un comentario
- */
 export const createComment = async (
   postId: string,
   data: {
@@ -126,16 +100,13 @@ export const createComment = async (
   }
 ) => {
   const response = await axios.post(
-    `${API_URL}/blog/posts/${postId}/comments`,
-    data,
+    `${API_URL}/comments`, // ✅ Cambiar ruta
+    { ...data, postId }, // ✅ Incluir postId en el body
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Actualizar un comentario
- */
 export const updateComment = async (
   commentId: string,
   data: {
@@ -143,86 +114,25 @@ export const updateComment = async (
   }
 ) => {
   const response = await axios.put(
-    `${API_URL}/blog/comments/${commentId}`,
+    `${API_URL}/comments/${commentId}`, // ✅ Cambiar ruta
     data,
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Eliminar un comentario
- */
 export const deleteComment = async (commentId: string) => {
   const response = await axios.delete(
-    `${API_URL}/blog/comments/${commentId}`,
+    `${API_URL}/comments/${commentId}`, // ✅ Cambiar ruta
     { headers: getAuthHeader() }
   );
   return response.data;
 };
 
-/**
- * Dar like a un comentario
- */
 export const likeComment = async (commentId: string) => {
   const response = await axios.post(
-    `${API_URL}/blog/comments/${commentId}/like`,
+    `${API_URL}/comments/${commentId}/like`, // ✅ Cambiar ruta
     {},
-    { headers: getAuthHeader() }
-  );
-  return response.data;
-};
-
-// ============================================
-// TAGS
-// ============================================
-
-/**
- * Obtener todos los tags
- */
-export const getAllTags = async () => {
-  const response = await axios.get(`${API_URL}/blog/tags`);
-  return response.data;
-};
-
-/**
- * Obtener posts por tag
- */
-export const getPostsByTag = async (tag: string) => {
-  const response = await axios.get(`${API_URL}/blog/tags/${tag}/posts`);
-  return response.data;
-};
-
-// ============================================
-// USUARIOS
-// ============================================
-
-/**
- * Obtener perfil de usuario
- */
-export const getUserProfile = async (username: string) => {
-  const response = await axios.get(`${API_URL}/blog/users/${username}`);
-  return response.data;
-};
-
-/**
- * Seguir a un usuario
- */
-export const followUser = async (userId: string) => {
-  const response = await axios.post(
-    `${API_URL}/blog/users/${userId}/follow`,
-    {},
-    { headers: getAuthHeader() }
-  );
-  return response.data;
-};
-
-/**
- * Dejar de seguir a un usuario
- */
-export const unfollowUser = async (userId: string) => {
-  const response = await axios.delete(
-    `${API_URL}/blog/users/${userId}/follow`,
     { headers: getAuthHeader() }
   );
   return response.data;
@@ -232,29 +142,23 @@ export const unfollowUser = async (userId: string) => {
 // BÚSQUEDA
 // ============================================
 
-/**
- * Buscar posts
- */
 export const searchPosts = async (query: string) => {
-  const response = await axios.get(`${API_URL}/blog/search`, {
-    params: { q: query },
+  const response = await axios.get(`${API_URL}/posts`, {
+    params: { search: query }, // ✅ Usar parámetro search
   });
   return response.data;
 };
 
 // ============================================
-// UPLOAD
+// UPLOAD (Si tienes ruta de upload)
 // ============================================
 
-/**
- * Subir imagen para post
- */
 export const uploadImage = async (file: File) => {
   const formData = new FormData();
   formData.append('image', file);
 
   const response = await axios.post(
-    `${API_URL}/blog/upload`,
+    `${API_URL}/upload`, // ✅ Verificar si existe esta ruta
     formData,
     {
       headers: {

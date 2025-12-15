@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://thinkel.onrender.com';
+// ✅ Agregar /api al final
+const API_URL = import.meta.env.VITE_API_URL || 'https://thinkel.onrender.com/api';
 
 // Configurar axios para incluir el token en cada petición
 const api = axios.create({
